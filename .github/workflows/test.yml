@@ -36,7 +36,7 @@ jobs:
     - name: Run Selenium Tests
       run: |
         # Run your python script (adjust the filename)
-        python your_test_file.py
+        python main.py
       env:
         # Use headless mode in GitHub Actions
         CHROME_OPTIONS: "--headless --no-sandbox --disable-dev-shm-usage"
