@@ -1,0 +1,55 @@
+name: Selenium and JMeter Suite
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # --- SETUP JAVA (Required for JMeter) ---
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # --- SETUP PYTHON (Required for Selenium) ---
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install selenium pytest
+
+    # --- RUN SELENIUM TESTS ---
+    - name: Run Selenium Tests
+      run: |
+        # Run your python script (adjust the filename)
+        python your_test_file.py
+      env:
+        # Use headless mode in GitHub Actions
+        CHROME_OPTIONS: "--headless --no-sandbox --disable-dev-shm-usage"
+
+    - name: Run JMeter Test
+      uses: rbhadti94/apache-jmeter-action@v0.5.0
+      with:
+        testFilePath: jmeter-tests/TestPlan.jmx
+        outputReportsFolder: jmeter-results/
+
+    - name: Upload JMeter Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: jmeter-report
+        path: jmeter-results/
